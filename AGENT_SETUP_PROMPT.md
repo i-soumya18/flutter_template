@@ -1,6 +1,4 @@
 # Rite Labs Flutter Template — Agent Setup Prompt
-# Paste this entire prompt into Claude Code (or any coding agent) to generate the full template.
-# Usage: `claude` → paste prompt → let it run end-to-end.
 
 ---
 
