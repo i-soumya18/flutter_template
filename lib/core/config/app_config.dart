@@ -6,7 +6,20 @@ class AppConfig {
   static String get environment => dotenv.env['ENVIRONMENT'] ?? 'development';
   static String get apiBaseUrl => dotenv.env['API_BASE_URL'] ?? '';
   static String get firebaseProjectId =>
-      dotenv.env['FIREBASE_PROJECT_ID'] ?? '';
+      dotenv.env['FIREBASE_PROJECT_ID']?.trim() ?? '';
+  static String get firebaseApiKey =>
+      dotenv.env['FIREBASE_API_KEY']?.trim() ?? '';
+  static String get firebaseAppId =>
+      dotenv.env['FIREBASE_APP_ID']?.trim() ?? '';
+  static String get firebaseMessagingSenderId =>
+      dotenv.env['FIREBASE_MESSAGING_SENDER_ID']?.trim() ?? '';
+  static String get firebaseStorageBucket =>
+      dotenv.env['FIREBASE_STORAGE_BUCKET']?.trim() ?? '';
+  static bool get hasFirebaseConfig =>
+      firebaseProjectId.isNotEmpty &&
+      firebaseApiKey.isNotEmpty &&
+      firebaseAppId.isNotEmpty &&
+      firebaseMessagingSenderId.isNotEmpty;
   static String get revenuecatAndroidKey =>
       dotenv.env['REVENUECAT_PUBLIC_KEY_ANDROID'] ?? '';
   static String get revenuecatIosKey =>

@@ -8,16 +8,37 @@ class AuthRemoteDataSource {
   })  : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
         _googleSignIn = googleSignIn ?? GoogleSignIn();
 
-  final FirebaseAuth _firebaseAuth;
-  final GoogleSignIn _googleSignIn;
+  const AuthRemoteDataSource.disabled()
+      : _firebaseAuth = null,
+        _googleSignIn = null;
 
-  Stream<User?> authStateChanges() => _firebaseAuth.authStateChanges();
+  final FirebaseAuth? _firebaseAuth;
+  final GoogleSignIn? _googleSignIn;
+
+  FirebaseAuth get _auth {
+    final auth = _firebaseAuth;
+    if (auth == null) {
+      throw StateError('Firebase auth is not configured for this template.');
+    }
+    return auth;
+  }
+
+  GoogleSignIn get _google {
+    final google = _googleSignIn;
+    if (google == null) {
+      throw StateError('Google sign-in is not configured for this template.');
+    }
+    return google;
+  }
+
+  Stream<User?> authStateChanges() =>
+      _firebaseAuth?.authStateChanges() ?? Stream.value(null);
 
   Future<UserCredential> signInWithEmail({
     required String email,
     required String password,
   }) {
-    return _firebaseAuth.signInWithEmailAndPassword(
+    return _auth.signInWithEmailAndPassword(
       email: email,
       password: password,
     );
@@ -28,7 +49,7 @@ class AuthRemoteDataSource {
     required String email,
     required String password,
   }) async {
-    final credential = await _firebaseAuth.createUserWithEmailAndPassword(
+    final credential = await _auth.createUserWithEmailAndPassword(
       email: email,
       password: password,
     );
@@ -37,7 +58,7 @@ class AuthRemoteDataSource {
   }
 
   Future<UserCredential> signInWithGoogle() async {
-    final account = await _googleSignIn.signIn();
+    final account = await _google.signIn();
     if (account == null) {
       throw StateError('Google sign-in cancelled');
     }
@@ -46,15 +67,15 @@ class AuthRemoteDataSource {
       accessToken: auth.accessToken,
       idToken: auth.idToken,
     );
-    return _firebaseAuth.signInWithCredential(credential);
+    return _auth.signInWithCredential(credential);
   }
 
   Future<void> signOut() async {
     await Future.wait([
-      _firebaseAuth.signOut(),
-      _googleSignIn.signOut(),
+      _auth.signOut(),
+      _google.signOut(),
     ]);
   }
 
-  User? get currentUser => _firebaseAuth.currentUser;
+  User? get currentUser => _firebaseAuth?.currentUser;
 }

@@ -1,12 +1,15 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_template/core/config/app_config.dart';
 import 'package:flutter_template/features/auth/data/datasources/auth_remote_datasource.dart';
 import 'package:flutter_template/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:flutter_template/features/auth/domain/entities/user_entity.dart';
 import 'package:flutter_template/features/auth/domain/repositories/auth_repository.dart';
 
 final authRemoteDataSourceProvider = Provider<AuthRemoteDataSource>(
-  (_) => AuthRemoteDataSource(),
+  (_) => AppConfig.hasFirebaseConfig
+      ? AuthRemoteDataSource()
+      : const AuthRemoteDataSource.disabled(),
 );
 
 final authRepositoryProvider = Provider<AuthRepository>(
@@ -14,7 +17,7 @@ final authRepositoryProvider = Provider<AuthRepository>(
 );
 
 final authStateProvider = StreamProvider<User?>(
-  (_) => FirebaseAuth.instance.authStateChanges(),
+  (ref) => ref.watch(authRemoteDataSourceProvider).authStateChanges(),
 );
 
 final currentUserProvider = Provider<UserEntity?>((ref) {

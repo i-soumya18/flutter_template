@@ -32,6 +32,12 @@ class DashboardScaffold extends StatelessWidget {
       selectedIcon: Icons.person,
       route: RouteConstants.profile,
     ),
+    (
+      label: 'Settings',
+      icon: Icons.settings_outlined,
+      selectedIcon: Icons.settings,
+      route: RouteConstants.settings,
+    ),
   ];
 
   @override
@@ -51,7 +57,8 @@ class DashboardScaffold extends StatelessWidget {
           : null,
       bottomNavigationBar: NavigationBar(
         selectedIndex: currentIndex,
-        onDestinationSelected: (index) => context.go(_destinations[index].route),
+        onDestinationSelected: (index) =>
+            context.go(_destinations[index].route),
         destinations: _destinations
             .map(
               (d) => NavigationDestination(
