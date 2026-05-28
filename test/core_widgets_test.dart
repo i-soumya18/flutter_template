@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_template/core/constants/route_constants.dart';
 import 'package:flutter_template/core/widgets/app_bottom_sheet.dart';
 import 'package:flutter_template/core/widgets/app_button.dart';
 import 'package:flutter_template/core/widgets/app_dialog.dart';
@@ -11,8 +12,11 @@ import 'package:flutter_template/core/widgets/app_snackbar.dart';
 import 'package:flutter_template/core/widgets/app_text_field.dart';
 import 'package:flutter_template/core/widgets/async_value_widget.dart';
 import 'package:flutter_template/features/dashboard/presentation/widgets/dashboard_scaffold.dart';
+import 'package:flutter_template/features/onboarding/presentation/screens/onboarding_screen.dart';
+import 'package:flutter_template/features/splash/presentation/providers/splash_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   Widget app(Widget child) {
@@ -245,5 +249,49 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('$label tab'), findsOneWidget);
     }
+  });
+
+  test('Splash routes returning guest users directly to dashboard', () async {
+    SharedPreferences.setMockInitialValues({
+      'is_first_launch': false,
+    });
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+
+    final route = await container.read(splashNextRouteProvider.future);
+
+    expect(route, RouteConstants.dashboard);
+  });
+
+  testWidgets('Onboarding completes to dashboard when auth is not configured',
+      (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    final router = GoRouter(
+      initialLocation: RouteConstants.onboarding,
+      routes: [
+        GoRoute(
+          path: RouteConstants.onboarding,
+          builder: (_, __) => const OnboardingScreen(),
+        ),
+        GoRoute(
+          path: RouteConstants.dashboard,
+          builder: (_, __) => const Text('Guest dashboard'),
+        ),
+      ],
+    );
+
+    await tester.pumpWidget(
+      ProviderScope(
+        child: MaterialApp.router(
+          theme: ThemeData(useMaterial3: true),
+          routerConfig: router,
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('Skip'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Guest dashboard'), findsOneWidget);
   });
 }

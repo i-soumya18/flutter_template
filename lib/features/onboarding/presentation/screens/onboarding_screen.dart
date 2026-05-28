@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_template/core/config/app_config.dart';
 import 'package:flutter_template/core/constants/route_constants.dart';
 import 'package:flutter_template/core/constants/storage_keys.dart';
 import 'package:flutter_template/core/network/api_client.dart';
@@ -26,9 +27,15 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   }
 
   Future<void> _complete() async {
-    await ref.read(storageServiceProvider).writeBool(StorageKeys.isFirstLaunch, false);
+    await ref
+        .read(storageServiceProvider)
+        .writeBool(StorageKeys.isFirstLaunch, false);
     if (!mounted) return;
-    context.go(RouteConstants.login);
+    context.go(
+      AppConfig.hasFirebaseConfig
+          ? RouteConstants.login
+          : RouteConstants.dashboard,
+    );
   }
 
   @override
@@ -50,7 +57,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 controller: _pageController,
                 itemCount: pages.length,
                 onPageChanged: (index) => _currentPage.value = index,
-                itemBuilder: (context, index) => OnboardingPageWidget(page: pages[index]),
+                itemBuilder: (context, index) =>
+                    OnboardingPageWidget(page: pages[index]),
               ),
             ),
             ValueListenableBuilder<int>(
@@ -73,7 +81,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                             decoration: BoxDecoration(
                               color: dotIndex == index
                                   ? Theme.of(context).colorScheme.primary
-                                  : Theme.of(context).colorScheme.outlineVariant,
+                                  : Theme.of(context)
+                                      .colorScheme
+                                      .outlineVariant,
                               borderRadius: BorderRadius.circular(100),
                             ),
                           ),

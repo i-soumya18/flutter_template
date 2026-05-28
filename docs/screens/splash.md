@@ -127,6 +127,9 @@ Is first launch?
         Is authenticated?
           → YES → / (dashboard)
           → NO  → /auth/login
+
+If Firebase env credentials are blank, auth is treated as disabled and the
+post-splash route is `/` after onboarding has been completed.
 ```
 
 "First launch" is determined by `SharedPreferences` key `has_completed_onboarding`.

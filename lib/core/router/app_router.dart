@@ -1,5 +1,6 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_template/core/config/app_config.dart';
 import 'package:flutter_template/core/constants/route_constants.dart';
 import 'package:flutter_template/core/router/app_routes.dart';
 import 'package:flutter_template/features/auth/presentation/providers/auth_provider.dart';
@@ -28,8 +29,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         RouteConstants.forgotPassword,
       };
 
-      if (location == RouteConstants.splash || location == RouteConstants.onboarding) {
+      if (location == RouteConstants.splash ||
+          location == RouteConstants.onboarding) {
         return null;
+      }
+      if (!AppConfig.hasFirebaseConfig) {
+        return authPaths.contains(location) ? RouteConstants.dashboard : null;
       }
       if (!isAuthenticated && !authPaths.contains(location)) {
         return RouteConstants.login;
@@ -179,4 +184,3 @@ class _NotFoundScreen extends StatelessWidget {
     );
   }
 }
-
